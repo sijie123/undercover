@@ -1,0 +1,23 @@
+{
+  "name": "undercover_bot",
+  "version": "1.0.0",
+  "description": "A telegram bot, nodeJS implementation of popular Chinese TV show game Undercover",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sijie123/undercover.git"
+  },
+  "author": "Si Jie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sijie123/undercover/issues"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.27.1"
+  },
+  "homepage": "https://github.com/sijie123/undercover#readme"
+}
