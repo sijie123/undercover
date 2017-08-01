@@ -519,7 +519,7 @@ bot.on('message', (msg) => {
       else {
         var grp = result[0].groupID;
         bot.sendMessage(result[0].groupID, result[0].playerName + " described his word as: " + msg.text);
-        db.query("UPDATE state, ( SELECT posn, groupID FROM players WHERE groupID = ? AND posn > ? AND alive = 1 ORDER BY posn ASC LIMIT 1 ) tempTable SET state.currentPlayerOrder = tempTable.posn WHERE state.telegramID = tempTable.groupID", [result[0].groupID, result[0].playerOrder], function(err, result) {
+        db.query("UPDATE state, ( SELECT posn, groupID FROM players WHERE groupID = ? AND posn > ? AND alive = 1 ORDER BY posn ASC LIMIT 1 ) tempTable SET state.currentPlayerOrder = tempTable.posn WHERE state.telegramID = tempTable.groupID", [result[0].groupID, result[0].playOrder], function(err, result) {
           if (err) throw err;
           if (result.affectedRows == 0) {
             //Everyone has said something. Time to vote.
