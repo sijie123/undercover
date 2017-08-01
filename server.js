@@ -261,7 +261,7 @@ function promptForVote(chatID) {
   db.query("UPDATE state SET currentPlayerOrder = -1 WHERE telegramID = ? LIMIT 1", [chatID], function(err, result) {
       if (err) throw err;
   });
-  db.query("SELECT telegramID as playerID, name FROM players WHERE alive = 1 AND groupID = ? LIMIT 1", [chatID], function(err, result) {
+  db.query("SELECT telegramID as playerID, name FROM players WHERE alive = 1 AND groupID = ?", [chatID], function(err, result) {
       if (err) throw err;
       if (result.length <= 2) {
         throw "Bot has messed up!";
@@ -401,7 +401,7 @@ function countVote(chatID) {
 function promptForDescription(chatID) {
   db.query("SELECT state.currentPlayerOrder as playOrder, players.telegramID as playerID, players.name as playerName FROM state INNER JOIN players ON state.currentPlayerOrder = players.posn AND state.telegramID = players.groupID AND state.telegramID = ? LIMIT 1", [chatID], function(err, result) {
       if (err) throw err;
-      if (result[0].currentPlayerOrder <= 0) {
+      if (result[0].playOrder <= 0) {
         throw "Bot has messed up!";
       }
       bot.sendMessage(chatID, "It's " + result[0].playerName + "'s turn. Please PM me a short description of your word.");
