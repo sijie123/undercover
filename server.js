@@ -358,6 +358,7 @@ function countVote(chatID) {
       })
     }], function(err, result) {
       if (err) {
+        console.log(err);
         return;
       }
       else {
@@ -568,7 +569,7 @@ bot.on('callback_query', function (msg) {
           if (err) {
             bot.answerCallbackQuery(msg.id, null);
             bot.editMessageReplyMarkup('', {message_id: msg.message.message_id, chat_id: msg.message.chat.id});
-            callback("ERR");
+            callback("ERR from makevote:" + err);
           }
           else {
             bot.answerCallbackQuery(msg.id, null);
