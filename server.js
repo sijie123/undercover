@@ -181,16 +181,16 @@ function setupgame(chat, finishSetup) {
 });
 }
 
-function cleanupgame(chat) {
+function cleanupgame(chatID) {
   async.parallel([
     function(callback) {
-      db.query("DELETE FROM players WHERE groupID = ?", [chat.id], function(err, result) {
+      db.query("DELETE FROM players WHERE groupID = ?", [chatID], function(err, result) {
         if (err) throw err;
         callback(null);
       });
     },
     function(callback) {
-      db.query("DELETE FROM state WHERE telegramID = ?", [chat.id], function(err, result) {
+      db.query("DELETE FROM state WHERE telegramID = ?", [chatID], function(err, result) {
         if (err) throw err;
         callback(null);
       });
@@ -214,14 +214,14 @@ function countNoPlayers(chat, callback) {
   });
 }
 
-function checkEnd(chat, checkBack) {
+function checkEnd(chatID, checkBack) {
   async.series([
     function(callback) {
-      db.query("SELECT id from players WHERE groupID = ? AND isSpy = 1 AND alive = 1", [chat.id], function(err, result) {
+      db.query("SELECT id from players WHERE groupID = ? AND isSpy = 1 AND alive = 1", [chatID], function(err, result) {
         if (err) throw err;
         if (result.length == 0) {
           //Game has ended
-          bot.sendMessage(chat.id, "Game has ended! The spy has lost!");
+          bot.sendMessage(chatID, "Game has ended! The spy has lost!");
           callback("END");
         }
         else {
@@ -230,11 +230,11 @@ function checkEnd(chat, checkBack) {
       });
     },
     function(callback) {
-      db.query("SELECT id from players WHERE groupID = ? AND alive = 1", [chat.id], function(err, result) {
+      db.query("SELECT id from players WHERE groupID = ? AND alive = 1", [chatID], function(err, result) {
         if (err) throw err;
         if (result.length <= 2) {
           //Game has ended
-          bot.sendMessage(chat.id, "Game has ended! The spy has won!");
+          bot.sendMessage(chatID, "Game has ended! The spy has won!");
           callback("END");
         }
         else {
@@ -247,7 +247,7 @@ function checkEnd(chat, checkBack) {
     // result now equals 'done'
     if (err) {
       checkBack(true);
-      cleanupgame(chat);
+      cleanupgame(chatID);
       return;
     }
     else {
@@ -323,6 +323,9 @@ function makeVote(voter, voted, chatID, callback) {
 }
 
 function kill(telegramID, chatID) {
+  db.query("DELETE FROM votes WHERE gameID = ?", [chatID], function(err, result) {
+    if (err) throw err;
+  });
   db.query("SELECT name FROM players WHERE groupID = ? AND telegramID = ? LIMIT 1", [chatID, telegramID], function(err, result) {
       if (err) throw err;
       if (result.length == 0) {
@@ -388,13 +391,7 @@ function countVote(chatID) {
         }
         
         //Kill maxwho
-        
-        bot.sendMessage(maxwho, "You have been voted out!");
-        db.query("DELETE FROM votes WHERE gameID = ?", [chatID], function(err, result) {
-          if (err) throw err;
-          beginRound(chatID);
-        })
-        
+        kill(maxwho, chatID);
       }
     })
 }
@@ -411,15 +408,15 @@ function promptForDescription(chatID) {
 }
 
 
-function beginRound(chat) {
-  checkEnd(chat, function(ended) {
+function beginRound(chatID) {
+  checkEnd(chatID, function(ended) {
     if (ended) return;
     else {
-      db.query("SELECT posn FROM players WHERE alive = 1 AND groupID = ? ORDER BY posn ASC", [chat.id], function(err, result) {
+      db.query("SELECT posn FROM players WHERE alive = 1 AND groupID = ? ORDER BY posn ASC", [chatID], function(err, result) {
           if (err) throw err;
-          db.query("UPDATE state SET currentPlayerOrder = ? WHERE telegramID = ?", [result[0].posn, chat.id], function(err, result) {
+          db.query("UPDATE state SET currentPlayerOrder = ? WHERE telegramID = ?", [result[0].posn, chatID], function(err, result) {
               if (err) throw err;
-              promptForDescription(chat.id);
+              promptForDescription(chatID);
           });
       });
       
@@ -440,7 +437,7 @@ function startgame(chat, sender) {
         if (enoughPlayers) {
           bot.sendMessage(chat.id, "Starting game... Check your PM for your word!");
           setupgame(chat, function() {
-            beginRound(chat);
+            beginRound(chat.id);
           });
         }
         else {
