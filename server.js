@@ -27,7 +27,7 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 
 
 function join(chat, sender, verbose) {
-  if (chat.type != "group") {
+  if (chat.type != "group" && chat.type != "supergroup") {
     return;
   }
 
@@ -79,7 +79,7 @@ function join(chat, sender, verbose) {
 }
 
 function newgame(chat, sender, verbose) {
-  if (chat.type != "group") {
+  if (chat.type != "group" && chat.type != "supergroup") {
     return;
   }
   db.query("SELECT id FROM state WHERE telegramID = ? LIMIT 1", [chat.id], function (err, result) {
