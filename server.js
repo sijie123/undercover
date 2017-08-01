@@ -580,7 +580,10 @@ bot.on('callback_query', function (msg) {
     }],
     function(err,result) {
       if (err) console.log(err);
-      countVote(resp[0]);
+      else {
+        countVote(resp[0]);
+      }
+      
     }
   );
 });
