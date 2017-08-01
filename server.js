@@ -150,7 +150,7 @@ function setupgame(chat, finishSetup) {
     },
     function(normalWord, spyWord, callback) {
         // arg1 now equals 'three'
-        db.query("SET @sequence:= 0; UPDATE players SET posn = @sequence:=@rank+1 WHERE id IN ( SELECT id FROM ( SELECT id FROM players WHERE groupID = ? ORDER BY RAND() LIMIT 1 ) as tempTable )", [chat.id], function (err, result) {
+        db.query("SET @sequence:= 0; UPDATE players SET posn = @sequence:=@sequence+1 WHERE id IN ( SELECT id FROM ( SELECT id FROM players WHERE groupID = ? ORDER BY RAND() ) as tempTable )", [chat.id], function (err, result) {
           if (err) throw err;
           callback(null,normalWord, spyWord);
         });
